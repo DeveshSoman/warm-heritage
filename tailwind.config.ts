@@ -154,6 +154,7 @@ export default {
 			},
 			fontFamily: {
 				'mukta': ['Mukta', 'sans-serif'],
+				'marathi': ['Hind Vadodari', 'Mukta', 'sans-serif'],
 			},
 		}
 	},

@@ -1,4 +1,6 @@
 
+export type OccupationType = 'Salaried' | 'Business' | 'Housewife' | 'Retired';
+
 export interface Person {
   name: string;
   dob: Date | null;

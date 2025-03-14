@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { FamilyHead as FamilyHeadType } from '@/types/family';
+import { FamilyHead as FamilyHeadType, OccupationType } from '@/types/family';
 import { Calendar, Briefcase, Phone, User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +13,13 @@ import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface FamilyHeadProps {
   familyHead: FamilyHeadType;
@@ -20,6 +27,8 @@ interface FamilyHeadProps {
 }
 
 const FamilyHead: React.FC<FamilyHeadProps> = ({ familyHead, updateFamilyHead }) => {
+  const occupationOptions: OccupationType[] = ['Salaried', 'Business', 'Housewife', 'Retired'];
+
   return (
     <div className="glass-card rounded-xl p-6 animate-fade-in">
       <div className="flex items-center mb-4 space-x-2">
@@ -38,8 +47,8 @@ const FamilyHead: React.FC<FamilyHeadProps> = ({ familyHead, updateFamilyHead })
             id="head-name"
             value={familyHead.name}
             onChange={(e) => updateFamilyHead({ name: e.target.value })}
-            placeholder="Enter full name"
-            className="rounded-lg transition-all-300 focus:border-primary"
+            placeholder="Enter full name / पूर्ण नाव प्रविष्ट करा"
+            className="rounded-lg transition-all-300 focus:border-primary font-marathi"
             required
           />
         </div>
@@ -54,14 +63,14 @@ const FamilyHead: React.FC<FamilyHeadProps> = ({ familyHead, updateFamilyHead })
                 variant="outline"
                 className={cn(
                   "w-full justify-start text-left font-normal rounded-lg transition-all-300 border bg-background",
-                  !familyHead.dob && "text-muted-foreground"
+                  !familyHead.dob && "text-muted-foreground font-marathi"
                 )}
               >
                 <Calendar className="mr-2 h-4 w-4" />
                 {familyHead.dob ? (
                   format(familyHead.dob, "PPP")
                 ) : (
-                  <span>Select date</span>
+                  <span>Select date / तारीख निवडा</span>
                 )}
               </Button>
             </PopoverTrigger>
@@ -82,14 +91,21 @@ const FamilyHead: React.FC<FamilyHeadProps> = ({ familyHead, updateFamilyHead })
             <Briefcase className="h-4 w-4 mr-1" />
             Occupation <span className="text-destructive">*</span>
           </Label>
-          <Input
-            id="head-occupation"
+          <Select
             value={familyHead.occupation}
-            onChange={(e) => updateFamilyHead({ occupation: e.target.value })}
-            placeholder="Enter occupation"
-            className="rounded-lg transition-all-300 focus:border-primary"
-            required
-          />
+            onValueChange={(value) => updateFamilyHead({ occupation: value })}
+          >
+            <SelectTrigger id="head-occupation" className="rounded-lg transition-all-300 focus:border-primary font-marathi">
+              <SelectValue placeholder="Select occupation / व्यवसाय निवडा" />
+            </SelectTrigger>
+            <SelectContent>
+              {occupationOptions.map((option) => (
+                <SelectItem key={option} value={option} className="font-marathi">
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         
         <div className="space-y-2">
@@ -101,8 +117,8 @@ const FamilyHead: React.FC<FamilyHeadProps> = ({ familyHead, updateFamilyHead })
             id="head-phone"
             value={familyHead.phoneNumber}
             onChange={(e) => updateFamilyHead({ phoneNumber: e.target.value })}
-            placeholder="Enter phone number"
-            className="rounded-lg transition-all-300 focus:border-primary"
+            placeholder="Enter phone number / फोन नंबर प्रविष्ट करा"
+            className="rounded-lg transition-all-300 focus:border-primary font-marathi"
             type="tel"
             required
           />

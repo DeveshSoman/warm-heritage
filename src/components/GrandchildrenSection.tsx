@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Grandchild } from '@/types/family';
+import { Grandchild, OccupationType } from '@/types/family';
 import { Calendar, Briefcase, Phone, Baby, Plus, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,6 +13,13 @@ import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface GrandchildrenSectionProps {
   grandchildren: Grandchild[];
@@ -27,16 +34,18 @@ const GrandchildrenSection: React.FC<GrandchildrenSectionProps> = ({
   addGrandchild, 
   removeGrandchild 
 }) => {
+  const occupationOptions: OccupationType[] = ['Salaried', 'Business', 'Housewife', 'Retired'];
+
   if (grandchildren.length === 0) {
     return (
       <div className="ml-8 mt-2 border-l-2 border-family-green/30 pl-6 pb-4 animate-fade-in">
         <Button
           variant="outline"
           onClick={addGrandchild}
-          className="flex items-center gap-2 text-sm mt-2 border-dashed border-family-green hover:bg-family-green/10 transition-all-300"
+          className="flex items-center gap-2 text-sm mt-2 border-dashed border-family-green hover:bg-family-green/10 transition-all-300 font-marathi"
         >
           <Plus className="h-3 w-3" />
-          Add Grandchild
+          Add Grandchild / नातवंड जोडा
         </Button>
       </div>
     );
@@ -74,8 +83,8 @@ const GrandchildrenSection: React.FC<GrandchildrenSectionProps> = ({
                 id={`grandchild-${index}-name`}
                 value={grandchild.name}
                 onChange={(e) => updateGrandchild(index, { name: e.target.value })}
-                placeholder="Enter name"
-                className="rounded-lg text-sm h-8 transition-all-300"
+                placeholder="Enter name / नाव प्रविष्ट करा"
+                className="rounded-lg text-sm h-8 transition-all-300 font-marathi"
               />
             </div>
             
@@ -87,14 +96,14 @@ const GrandchildrenSection: React.FC<GrandchildrenSectionProps> = ({
                     variant="outline"
                     className={cn(
                       "w-full h-8 justify-start text-left font-normal text-sm rounded-lg transition-all-300",
-                      !grandchild.dob && "text-muted-foreground"
+                      !grandchild.dob && "text-muted-foreground font-marathi"
                     )}
                   >
                     <Calendar className="mr-2 h-3 w-3" />
                     {grandchild.dob ? (
                       format(grandchild.dob, "PPP")
                     ) : (
-                      <span>Select date</span>
+                      <span>Select date / तारीख निवडा</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -115,13 +124,24 @@ const GrandchildrenSection: React.FC<GrandchildrenSectionProps> = ({
                 <Briefcase className="h-3 w-3 mr-1" />
                 Occupation
               </Label>
-              <Input
-                id={`grandchild-${index}-occupation`}
+              <Select
                 value={grandchild.occupation}
-                onChange={(e) => updateGrandchild(index, { occupation: e.target.value })}
-                placeholder="Enter occupation"
-                className="rounded-lg text-sm h-8 transition-all-300"
-              />
+                onValueChange={(value) => updateGrandchild(index, { occupation: value })}
+              >
+                <SelectTrigger 
+                  id={`grandchild-${index}-occupation`}
+                  className="rounded-lg text-sm h-8 transition-all-300 font-marathi"
+                >
+                  <SelectValue placeholder="Select occupation / व्यवसाय निवडा" />
+                </SelectTrigger>
+                <SelectContent>
+                  {occupationOptions.map((option) => (
+                    <SelectItem key={option} value={option} className="font-marathi text-sm">
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             
             <div className="space-y-1">
@@ -133,8 +153,8 @@ const GrandchildrenSection: React.FC<GrandchildrenSectionProps> = ({
                 id={`grandchild-${index}-phone`}
                 value={grandchild.phoneNumber}
                 onChange={(e) => updateGrandchild(index, { phoneNumber: e.target.value })}
-                placeholder="Enter phone number"
-                className="rounded-lg text-sm h-8 transition-all-300"
+                placeholder="Enter phone number / फोन नंबर प्रविष्ट करा"
+                className="rounded-lg text-sm h-8 transition-all-300 font-marathi"
                 type="tel"
               />
             </div>
@@ -145,10 +165,10 @@ const GrandchildrenSection: React.FC<GrandchildrenSectionProps> = ({
       <Button
         variant="outline"
         onClick={addGrandchild}
-        className="flex items-center gap-2 text-sm mt-2 border-dashed border-family-green hover:bg-family-green/10 transition-all-300"
+        className="flex items-center gap-2 text-sm mt-2 border-dashed border-family-green hover:bg-family-green/10 transition-all-300 font-marathi"
       >
         <Plus className="h-3 w-3" />
-        Add Another Grandchild
+        Add Another Grandchild / आणखी नातवंड जोडा
       </Button>
     </div>
   );

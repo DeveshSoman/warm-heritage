@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { Child, Spouse, Grandchild } from '@/types/family';
+import { Child, Spouse, Grandchild, OccupationType } from '@/types/family';
 import { Calendar, Briefcase, Phone, PlusCircle, MinusCircle, User, Check, X, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,6 +13,13 @@ import { Calendar as CalendarComponent } from '@/components/ui/calendar';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import SpouseDetails from './SpouseDetails';
 import GrandchildrenSection from './GrandchildrenSection';
 
@@ -25,6 +31,8 @@ interface ChildDetailsProps {
 }
 
 const ChildDetails: React.FC<ChildDetailsProps> = ({ child, index, updateChild, removeChild }) => {
+  const occupationOptions: OccupationType[] = ['Salaried', 'Business', 'Housewife', 'Retired'];
+
   const addPhoneNumber = () => {
     updateChild(index, {
       additionalPhoneNumbers: [...child.additionalPhoneNumbers, '']
@@ -73,7 +81,6 @@ const ChildDetails: React.FC<ChildDetailsProps> = ({ child, index, updateChild, 
   const updateMaritalStatus = (status: 'Married' | 'Unmarried') => {
     const updates: Partial<Child> = { maritalStatus: status };
     
-    // If changing to married and no spouse yet, create one
     if (status === 'Married' && !child.spouse) {
       updates.spouse = {
         name: '',
@@ -115,8 +122,8 @@ const ChildDetails: React.FC<ChildDetailsProps> = ({ child, index, updateChild, 
             id={`child-${index}-name`}
             value={child.name}
             onChange={(e) => updateChild(index, { name: e.target.value })}
-            placeholder="Enter name"
-            className="rounded-lg transition-all-300"
+            placeholder="Enter name / नाव प्रविष्ट करा"
+            className="rounded-lg transition-all-300 font-marathi"
             required
           />
         </div>
@@ -131,14 +138,14 @@ const ChildDetails: React.FC<ChildDetailsProps> = ({ child, index, updateChild, 
                 variant="outline"
                 className={cn(
                   "w-full justify-start text-left font-normal rounded-lg transition-all-300",
-                  !child.dob && "text-muted-foreground"
+                  !child.dob && "text-muted-foreground font-marathi"
                 )}
               >
                 <Calendar className="mr-2 h-4 w-4" />
                 {child.dob ? (
                   format(child.dob, "PPP")
                 ) : (
-                  <span>Select date</span>
+                  <span>Select date / तारीख निवडा</span>
                 )}
               </Button>
             </PopoverTrigger>
@@ -159,14 +166,24 @@ const ChildDetails: React.FC<ChildDetailsProps> = ({ child, index, updateChild, 
             <Briefcase className="h-4 w-4 mr-1" />
             Occupation <span className="text-destructive">*</span>
           </Label>
-          <Input
-            id={`child-${index}-occupation`}
+          <Select
             value={child.occupation}
-            onChange={(e) => updateChild(index, { occupation: e.target.value })}
-            placeholder="Enter occupation"
-            className="rounded-lg transition-all-300"
-            required
-          />
+            onValueChange={(value) => updateChild(index, { occupation: value })}
+          >
+            <SelectTrigger 
+              id={`child-${index}-occupation`}
+              className="rounded-lg transition-all-300 font-marathi"
+            >
+              <SelectValue placeholder="Select occupation / व्यवसाय निवडा" />
+            </SelectTrigger>
+            <SelectContent>
+              {occupationOptions.map((option) => (
+                <SelectItem key={option} value={option} className="font-marathi">
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         
         <div className="space-y-2">
@@ -178,8 +195,8 @@ const ChildDetails: React.FC<ChildDetailsProps> = ({ child, index, updateChild, 
             id={`child-${index}-phone`}
             value={child.phoneNumber}
             onChange={(e) => updateChild(index, { phoneNumber: e.target.value })}
-            placeholder="Enter phone number"
-            className="rounded-lg transition-all-300"
+            placeholder="Enter phone number / फोन नंबर प्रविष्ट करा"
+            className="rounded-lg transition-all-300 font-marathi"
             type="tel"
             required
           />
