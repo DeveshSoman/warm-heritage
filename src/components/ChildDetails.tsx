@@ -1,27 +1,13 @@
+
 import React from 'react';
-import { Child, Spouse, Grandchild, OccupationType } from '@/types/family';
-import { Calendar, Briefcase, Phone, PlusCircle, MinusCircle, User, Check, X, Trash2 } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { 
-  Popover, 
-  PopoverContent, 
-  PopoverTrigger 
-} from '@/components/ui/popover';
+import { Child, Spouse, Grandchild } from '@/types/family';
+import { User, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import SpouseDetails from './SpouseDetails';
 import GrandchildrenSection from './GrandchildrenSection';
+import BasicChildDetails from './child/BasicChildDetails';
+import AdditionalPhoneNumbers from './child/AdditionalPhoneNumbers';
+import MaritalStatus from './child/MaritalStatus';
 
 interface ChildDetailsProps {
   child: Child;
@@ -31,7 +17,9 @@ interface ChildDetailsProps {
 }
 
 const ChildDetails: React.FC<ChildDetailsProps> = ({ child, index, updateChild, removeChild }) => {
-  const occupationOptions: OccupationType[] = ['Salaried', 'Business', 'Housewife', 'Retired'];
+  const updateField = (field: string, value: any) => {
+    updateChild(index, { [field]: value });
+  };
 
   const addPhoneNumber = () => {
     updateChild(index, {
@@ -113,164 +101,27 @@ const ChildDetails: React.FC<ChildDetailsProps> = ({ child, index, updateChild, 
         </Button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor={`child-${index}-name`} className="flex items-center gap-1">
-            Name <span className="text-destructive">*</span>
-          </Label>
-          <Input
-            id={`child-${index}-name`}
-            value={child.name}
-            onChange={(e) => updateChild(index, { name: e.target.value })}
-            placeholder="Enter name / नाव प्रविष्ट करा"
-            className="rounded-lg transition-all-300 font-marathi"
-            required
-          />
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor={`child-${index}-dob`} className="flex items-center gap-1">
-            Date of Birth <span className="text-destructive">*</span>
-          </Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal rounded-lg transition-all-300",
-                  !child.dob && "text-muted-foreground font-marathi"
-                )}
-              >
-                <Calendar className="mr-2 h-4 w-4" />
-                {child.dob ? (
-                  format(child.dob, "PPP")
-                ) : (
-                  <span>Select date / तारीख निवडा</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <CalendarComponent
-                mode="single"
-                selected={child.dob || undefined}
-                onSelect={(date) => updateChild(index, { dob: date })}
-                initialFocus
-                className="p-3 pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor={`child-${index}-occupation`} className="flex items-center gap-1">
-            <Briefcase className="h-4 w-4 mr-1" />
-            Occupation <span className="text-destructive">*</span>
-          </Label>
-          <Select
-            value={child.occupation}
-            onValueChange={(value) => updateChild(index, { occupation: value })}
-          >
-            <SelectTrigger 
-              id={`child-${index}-occupation`}
-              className="rounded-lg transition-all-300 font-marathi"
-            >
-              <SelectValue placeholder="Select occupation / व्यवसाय निवडा" />
-            </SelectTrigger>
-            <SelectContent>
-              {occupationOptions.map((option) => (
-                <SelectItem key={option} value={option} className="font-marathi">
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <Label htmlFor={`child-${index}-phone`} className="flex items-center gap-1">
-            <Phone className="h-4 w-4 mr-1" />
-            Phone Number <span className="text-destructive">*</span>
-          </Label>
-          <Input
-            id={`child-${index}-phone`}
-            value={child.phoneNumber}
-            onChange={(e) => updateChild(index, { phoneNumber: e.target.value })}
-            placeholder="Enter phone number / फोन नंबर प्रविष्ट करा"
-            className="rounded-lg transition-all-300 font-marathi"
-            type="tel"
-            required
-          />
-        </div>
-        
-        <div className="space-y-2 col-span-2">
-          <div className="flex items-center justify-between">
-            <Label className="flex items-center gap-1">
-              Additional Phone Numbers
-            </Label>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={addPhoneNumber}
-              className="h-8 px-2 text-xs hover:bg-primary/10 transition-all-300"
-            >
-              <PlusCircle className="h-3 w-3 mr-1" />
-              Add Number
-            </Button>
-          </div>
-          
-          {child.additionalPhoneNumbers.length > 0 ? (
-            <div className="space-y-2">
-              {child.additionalPhoneNumbers.map((phone, phoneIndex) => (
-                <div key={phoneIndex} className="flex gap-2">
-                  <Input
-                    value={phone}
-                    onChange={(e) => updatePhoneNumber(phoneIndex, e.target.value)}
-                    placeholder={`Additional phone number ${phoneIndex + 1}`}
-                    className="rounded-lg transition-all-300"
-                    type="tel"
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removePhoneNumber(phoneIndex)}
-                    className="hover:bg-destructive/10 hover:text-destructive transition-all-300"
-                  >
-                    <MinusCircle className="h-4 w-4" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-sm text-muted-foreground italic">No additional phone numbers added</p>
-          )}
-        </div>
-        
-        <div className="space-y-2 col-span-2">
-          <Label className="flex items-center gap-1">
-            Marital Status <span className="text-destructive">*</span>
-          </Label>
-          <RadioGroup 
-            value={child.maritalStatus} 
-            onValueChange={(value) => updateMaritalStatus(value as 'Married' | 'Unmarried')}
-            className="flex gap-4"
-          >
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Married" id={`married-${index}`} />
-              <Label htmlFor={`married-${index}`} className="flex items-center">
-                <Check className="h-4 w-4 mr-1 text-family-green" />
-                Married
-              </Label>
-            </div>
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="Unmarried" id={`unmarried-${index}`} />
-              <Label htmlFor={`unmarried-${index}`} className="flex items-center">
-                <X className="h-4 w-4 mr-1 text-family-pink" />
-                Unmarried
-              </Label>
-            </div>
-          </RadioGroup>
-        </div>
-      </div>
+      <BasicChildDetails 
+        name={child.name}
+        dob={child.dob}
+        occupation={child.occupation}
+        phoneNumber={child.phoneNumber}
+        index={index}
+        updateField={updateField}
+      />
+      
+      <AdditionalPhoneNumbers 
+        phoneNumbers={child.additionalPhoneNumbers}
+        addPhoneNumber={addPhoneNumber}
+        updatePhoneNumber={updatePhoneNumber}
+        removePhoneNumber={removePhoneNumber}
+      />
+      
+      <MaritalStatus 
+        maritalStatus={child.maritalStatus}
+        updateMaritalStatus={updateMaritalStatus}
+        index={index}
+      />
       
       {child.maritalStatus === 'Married' && child.spouse && (
         <SpouseDetails 
