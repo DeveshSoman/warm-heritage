@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Calendar, Briefcase, Phone, User } from 'lucide-react';
+import { Calendar, Briefcase, Phone, User, Calculator } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { 
@@ -10,7 +10,7 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { format } from 'date-fns';
+import { format, differenceInYears } from 'date-fns';
 import { cn } from '@/lib/utils';
 import {
   Select,
@@ -39,60 +39,80 @@ const BasicChildDetails: React.FC<BasicChildDetailsProps> = ({
   updateField
 }) => {
   const occupationOptions: OccupationType[] = ['Salaried', 'Business', 'Housewife', 'Retired'];
+  
+  // Calculate age if DOB is available
+  const calculateAge = (dob: Date | null): number => {
+    if (!dob) return 0;
+    return differenceInYears(new Date(), dob);
+  };
+  
+  const age = calculateAge(dob);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-2">
-        <Label htmlFor={`child-${index}-name`} className="flex items-center gap-1">
-          Name <span className="text-destructive">*</span>
+        <Label htmlFor={`child-${index}-name`} className="flex items-center gap-1 font-marathi">
+          Name / नाव <span className="text-destructive">*</span>
         </Label>
         <Input
           id={`child-${index}-name`}
           value={name}
           onChange={(e) => updateField('name', e.target.value)}
           placeholder="Enter name / नाव प्रविष्ट करा"
-          className="rounded-lg transition-all-300 font-marathi"
+          className="rounded-lg transition-all-300 font-marathi uppercase"
           required
         />
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor={`child-${index}-dob`} className="flex items-center gap-1">
-          Date of Birth <span className="text-destructive">*</span>
+        <Label htmlFor={`child-${index}-dob`} className="flex items-center gap-1 font-marathi">
+          Date of Birth / जन्मतारीख <span className="text-destructive">*</span>
         </Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal rounded-lg transition-all-300",
-                !dob && "text-muted-foreground font-marathi"
-              )}
-            >
-              <Calendar className="mr-2 h-4 w-4" />
-              {dob ? (
-                format(dob, "PPP")
-              ) : (
-                <span>Select date / तारीख निवडा</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
-            <CalendarComponent
-              mode="single"
-              selected={dob || undefined}
-              onSelect={(date) => updateField('dob', date)}
-              initialFocus
-              className="p-3 pointer-events-auto"
-            />
-          </PopoverContent>
-        </Popover>
+        <div className="flex gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className={cn(
+                  "w-full justify-start text-left font-normal rounded-lg transition-all-300",
+                  !dob && "text-muted-foreground font-marathi"
+                )}
+              >
+                <Calendar className="mr-2 h-4 w-4" />
+                {dob ? (
+                  format(dob, "dd-MM-yyyy")
+                ) : (
+                  <span>Select date / तारीख निवडा</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <CalendarComponent
+                mode="single"
+                selected={dob || undefined}
+                onSelect={(date) => updateField('dob', date)}
+                initialFocus
+                className="p-3 pointer-events-auto"
+                captionLayout="dropdown-buttons"
+                fromYear={1940}
+                toYear={new Date().getFullYear()}
+              />
+            </PopoverContent>
+          </Popover>
+          
+          {dob && (
+            <div className="px-3 py-2 bg-family-pink/10 rounded-lg flex items-center gap-1 text-sm whitespace-nowrap">
+              <Calculator className="h-4 w-4 text-family-pink" />
+              <span className="font-semibold">{age} Years</span>
+            </div>
+          )}
+        </div>
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor={`child-${index}-occupation`} className="flex items-center gap-1">
+        <Label htmlFor={`child-${index}-occupation`} className="flex items-center gap-1 font-marathi">
           <Briefcase className="h-4 w-4 mr-1" />
-          Occupation <span className="text-destructive">*</span>
+          Occupation / व्यवसाय <span className="text-destructive">*</span>
         </Label>
         <Select
           value={occupation}
@@ -115,9 +135,9 @@ const BasicChildDetails: React.FC<BasicChildDetailsProps> = ({
       </div>
       
       <div className="space-y-2">
-        <Label htmlFor={`child-${index}-phone`} className="flex items-center gap-1">
+        <Label htmlFor={`child-${index}-phone`} className="flex items-center gap-1 font-marathi">
           <Phone className="h-4 w-4 mr-1" />
-          Phone Number <span className="text-destructive">*</span>
+          Phone Number / फोन नंबर <span className="text-destructive">*</span>
         </Label>
         <Input
           id={`child-${index}-phone`}

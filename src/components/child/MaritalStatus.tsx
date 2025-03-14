@@ -18,7 +18,7 @@ const MaritalStatus: React.FC<MaritalStatusProps> = ({
   return (
     <div className="space-y-2 col-span-2">
       <Label className="flex items-center gap-1">
-        Marital Status <span className="text-destructive">*</span>
+        Marital Status / वैवाहिक स्थिती <span className="text-destructive">*</span>
       </Label>
       <RadioGroup 
         value={maritalStatus} 
@@ -29,14 +29,14 @@ const MaritalStatus: React.FC<MaritalStatusProps> = ({
           <RadioGroupItem value="Married" id={`married-${index}`} />
           <Label htmlFor={`married-${index}`} className="flex items-center">
             <Check className="h-4 w-4 mr-1 text-family-green" />
-            Married
+            Married / विवाहित
           </Label>
         </div>
         <div className="flex items-center space-x-2">
           <RadioGroupItem value="Unmarried" id={`unmarried-${index}`} />
           <Label htmlFor={`unmarried-${index}`} className="flex items-center">
             <X className="h-4 w-4 mr-1 text-family-pink" />
-            Unmarried
+            Unmarried / अविवाहित
           </Label>
         </div>
       </RadioGroup>

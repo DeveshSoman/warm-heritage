@@ -5,6 +5,8 @@ import FamilyHeadComponent from './FamilyHead';
 import ChildrenSection from './ChildrenSection';
 import ExportButton from './ExportButton';
 import { toast } from 'sonner';
+import { Button } from './ui/button';
+import { Save } from 'lucide-react';
 
 const initialFamilyData: FamilyData = {
   familyHead: {
@@ -18,23 +20,46 @@ const initialFamilyData: FamilyData = {
 
 const FamilyForm: React.FC = () => {
   const [familyData, setFamilyData] = useState<FamilyData>(initialFamilyData);
+  const [formSubmitted, setFormSubmitted] = useState(false);
   
   const updateFamilyHead = (updatedHead: Partial<FamilyHead>) => {
+    // Convert name to uppercase if it's a string
+    const processedUpdate = { ...updatedHead };
+    if (typeof processedUpdate.name === 'string') {
+      processedUpdate.name = processedUpdate.name.toUpperCase();
+    }
+    
     setFamilyData({
       ...familyData,
       familyHead: {
         ...familyData.familyHead,
-        ...updatedHead
+        ...processedUpdate
       }
     });
   };
   
   const updateChild = (index: number, updatedChild: Partial<Child>) => {
+    const processedUpdate = { ...updatedChild };
+    
+    // Convert name and other text fields to uppercase
+    if (typeof processedUpdate.name === 'string') {
+      processedUpdate.name = processedUpdate.name.toUpperCase();
+    }
+    
+    // Process spouse name if provided
+    if (processedUpdate.spouse && typeof processedUpdate.spouse.name === 'string') {
+      processedUpdate.spouse = {
+        ...processedUpdate.spouse,
+        name: processedUpdate.spouse.name.toUpperCase()
+      };
+    }
+    
     const newChildren = [...familyData.children];
     newChildren[index] = {
       ...newChildren[index],
-      ...updatedChild
+      ...processedUpdate
     };
+    
     setFamilyData({
       ...familyData,
       children: newChildren
@@ -104,14 +129,38 @@ const FamilyForm: React.FC = () => {
           return false;
         }
       }
+      
+      // Check all grandchildren if they exist
+      for (const grandchild of child.children) {
+        if (!grandchild.name || !grandchild.dob) {
+          return false;
+        }
+      }
     }
     
     return true;
   };
   
+  const handleSubmit = () => {
+    if (validateFamilyData()) {
+      toast.success('Form submitted successfully', {
+        description: 'Your family data has been processed',
+      });
+      setFormSubmitted(true);
+    } else {
+      toast.error('Please fill in all required fields', {
+        description: 'All fields marked with * are mandatory',
+      });
+    }
+  };
+  
   return (
     <div className="container px-4 mx-auto mb-20">
       <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl md:text-3xl font-bold text-center mb-8 text-primary font-marathi">
+          Family Data Form / कुटुंब माहिती फॉर्म
+        </h1>
+        
         <div className="mb-8">
           <FamilyHeadComponent
             familyHead={familyData.familyHead}
@@ -128,10 +177,20 @@ const FamilyForm: React.FC = () => {
           />
         </div>
         
-        <div className="mt-8 flex justify-center">
+        <div className="mt-8 flex justify-center gap-4 flex-wrap">
+          <Button 
+            onClick={handleSubmit}
+            className="bg-family-green hover:bg-family-green/80 text-white flex items-center gap-2"
+            size="lg"
+          >
+            <Save className="h-5 w-5" />
+            <span className="font-marathi">Submit Form / फॉर्म सबमिट करा</span>
+          </Button>
+          
           <ExportButton
             familyData={familyData}
             isValid={validateFamilyData()}
+            formSubmitted={formSubmitted}
           />
         </div>
       </div>

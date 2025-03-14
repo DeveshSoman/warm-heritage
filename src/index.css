@@ -105,4 +105,25 @@
   .hover-elevate {
     @apply hover:shadow-md hover:-translate-y-1 transition-all duration-300;
   }
+  
+  /* Enhanced form styles */
+  input[type="text"], 
+  input[type="tel"], 
+  input[type="email"],
+  input[type="number"] {
+    @apply focus:ring-2 focus:ring-family-blue/30 focus:border-family-blue;
+  }
+  
+  .required-field::after {
+    content: "*";
+    @apply text-destructive ml-1;
+  }
+  
+  .form-card {
+    @apply bg-gradient-to-br from-white to-family-beige/50 border border-family-beige/30 shadow-sm rounded-xl p-5;
+  }
+  
+  .family-gradient-bg {
+    @apply bg-gradient-to-b from-family-beige via-white to-family-beige/30;
+  }
 }

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Grandchild, OccupationType } from '@/types/family';
-import { Calendar, Briefcase, Phone, Baby, Plus, Trash2 } from 'lucide-react';
+import { Calendar, Briefcase, Phone, Baby, Plus, Trash2, Calculator } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { 
@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { Calendar as CalendarComponent } from '@/components/ui/calendar';
-import { format } from 'date-fns';
+import { format, differenceInYears } from 'date-fns';
 import { cn } from '@/lib/utils';
 import {
   Select,
@@ -35,6 +35,12 @@ const GrandchildrenSection: React.FC<GrandchildrenSectionProps> = ({
   removeGrandchild 
 }) => {
   const occupationOptions: OccupationType[] = ['Salaried', 'Business', 'Housewife', 'Retired'];
+  
+  // Calculate age if DOB is available
+  const calculateAge = (dob: Date | null): number => {
+    if (!dob) return 0;
+    return differenceInYears(new Date(), dob);
+  };
 
   if (grandchildren.length === 0) {
     return (
@@ -57,14 +63,14 @@ const GrandchildrenSection: React.FC<GrandchildrenSectionProps> = ({
         <div className="h-6 w-6 rounded-full bg-family-green/30 flex items-center justify-center">
           <Baby className="h-3 w-3 text-primary" />
         </div>
-        <h3 className="text-md font-medium">Grandchildren</h3>
+        <h3 className="text-md font-medium font-marathi">Grandchildren / नातवंडे</h3>
       </div>
       
       {grandchildren.map((grandchild, index) => (
         <div key={index} className="mb-4 p-3 rounded-lg bg-family-green/5 border border-family-green/20 animate-slide-up">
           <div className="flex justify-between items-center mb-2">
             <div className="chip px-2 py-0.5 bg-family-green/20 text-xs rounded-full">
-              Grandchild {index + 1}
+              Grandchild {index + 1} / नातू-नात {index + 1}
             </div>
             <Button
               variant="ghost"
@@ -78,51 +84,63 @@ const GrandchildrenSection: React.FC<GrandchildrenSectionProps> = ({
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <div className="space-y-1">
-              <Label htmlFor={`grandchild-${index}-name`} className="text-xs">Name</Label>
+              <Label htmlFor={`grandchild-${index}-name`} className="text-xs font-marathi">Name / नाव <span className="text-destructive">*</span></Label>
               <Input
                 id={`grandchild-${index}-name`}
                 value={grandchild.name}
-                onChange={(e) => updateGrandchild(index, { name: e.target.value })}
+                onChange={(e) => updateGrandchild(index, { name: e.target.value.toUpperCase() })}
                 placeholder="Enter name / नाव प्रविष्ट करा"
-                className="rounded-lg text-sm h-8 transition-all-300 font-marathi"
+                className="rounded-lg text-sm h-8 transition-all-300 font-marathi uppercase"
               />
             </div>
             
             <div className="space-y-1">
-              <Label htmlFor={`grandchild-${index}-dob`} className="text-xs">Date of Birth</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className={cn(
-                      "w-full h-8 justify-start text-left font-normal text-sm rounded-lg transition-all-300",
-                      !grandchild.dob && "text-muted-foreground font-marathi"
-                    )}
-                  >
-                    <Calendar className="mr-2 h-3 w-3" />
-                    {grandchild.dob ? (
-                      format(grandchild.dob, "PPP")
-                    ) : (
-                      <span>Select date / तारीख निवडा</span>
-                    )}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <CalendarComponent
-                    mode="single"
-                    selected={grandchild.dob || undefined}
-                    onSelect={(date) => updateGrandchild(index, { dob: date })}
-                    initialFocus
-                    className="p-3 pointer-events-auto"
-                  />
-                </PopoverContent>
-              </Popover>
+              <Label htmlFor={`grandchild-${index}-dob`} className="text-xs font-marathi">Date of Birth / जन्मतारीख <span className="text-destructive">*</span></Label>
+              <div className="flex gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={cn(
+                        "w-full h-8 justify-start text-left font-normal text-sm rounded-lg transition-all-300",
+                        !grandchild.dob && "text-muted-foreground font-marathi"
+                      )}
+                    >
+                      <Calendar className="mr-2 h-3 w-3" />
+                      {grandchild.dob ? (
+                        format(grandchild.dob, "dd-MM-yyyy")
+                      ) : (
+                        <span>Select date / तारीख निवडा</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <CalendarComponent
+                      mode="single"
+                      selected={grandchild.dob || undefined}
+                      onSelect={(date) => updateGrandchild(index, { dob: date })}
+                      initialFocus
+                      className="p-3 pointer-events-auto"
+                      captionLayout="dropdown-buttons"
+                      fromYear={1980}
+                      toYear={new Date().getFullYear()}
+                    />
+                  </PopoverContent>
+                </Popover>
+                
+                {grandchild.dob && (
+                  <div className="px-2 h-8 bg-family-green/10 rounded-lg flex items-center gap-1 text-xs whitespace-nowrap">
+                    <Calculator className="h-3 w-3 text-family-green" />
+                    <span className="font-semibold">{calculateAge(grandchild.dob)} Years</span>
+                  </div>
+                )}
+              </div>
             </div>
             
             <div className="space-y-1">
-              <Label htmlFor={`grandchild-${index}-occupation`} className="text-xs flex items-center">
+              <Label htmlFor={`grandchild-${index}-occupation`} className="text-xs flex items-center font-marathi">
                 <Briefcase className="h-3 w-3 mr-1" />
-                Occupation
+                Occupation / व्यवसाय
               </Label>
               <Select
                 value={grandchild.occupation}
@@ -145,9 +163,9 @@ const GrandchildrenSection: React.FC<GrandchildrenSectionProps> = ({
             </div>
             
             <div className="space-y-1">
-              <Label htmlFor={`grandchild-${index}-phone`} className="text-xs flex items-center">
+              <Label htmlFor={`grandchild-${index}-phone`} className="text-xs flex items-center font-marathi">
                 <Phone className="h-3 w-3 mr-1" />
-                Phone Number
+                Phone Number / फोन नंबर
               </Label>
               <Input
                 id={`grandchild-${index}-phone`}
